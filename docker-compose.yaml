@@ -1,0 +1,36 @@
+version: "3.9"
+services:
+        ipfs_host:
+                image: ipfs/go-ipfs:latest
+                environment:
+                        - IPFS_PROFILE=server
+                        - IPFS_PATH=/ipfsdata
+                volumes:
+                        - ./data/ipfs:/ipfsdata
+                ports:
+                        - "4001:4001"
+                        - "127.0.0.1:8080:8080"
+                        - "127.0.0.1:8081:8081"
+                        - "127.0.0.1:5001:5001"
+                restart: unless-stopped
+        nginx:
+                image: nginx:1.17.2
+                ports:
+                        - "80:80"
+                        - "443:443"
+                        - "4003:4003"
+                volumes:
+                        - ./data/nginx:/etc/nginx/conf.d
+                        - ./data/certbot/conf:/etc/letsencrypt
+                        - ./data/certbot/www:/var/www/certbot
+                command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+                restart: unless-stopped
+        certbot:
+                #if you are not on amd64, check out https://hub.docker.com/r/certbot/certbot/tags?page=1&ordering=last_updated for images, e.g. for arm: certbot/certbot:arm32v6-latest                
+                image: certbot/certbot
+                volumes:
+                        - ./data/certbot/conf:/etc/letsencrypt
+                        - ./data/certbot/www:/var/www/certbot
+                entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+                restart: unless-stopped
+
