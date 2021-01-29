@@ -65,9 +65,10 @@ docker-compose run --rm --entrypoint "\
           --force-renewal" certbot
 
 docker-compose run --rm --entrypoint "\
-          ln -s -f $path/fullchain.pem $temp_ssl_path/fullchain.pem; \
           ln -s -f $path/privkey.pem $temp_ssl_path/privkey.pem" certbot
 
+docker-compose run --rm --entrypoint "\
+          ln -s -f $path/fullchain.pem $temp_ssl_path/fullchain.pem" certbot
 
 docker-compose down
 echo "Everything should be ready now! Starting..."
