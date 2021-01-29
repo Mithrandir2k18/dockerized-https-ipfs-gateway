@@ -6,7 +6,8 @@ email=ssl@mydomain.com
 
 
 echo "Creating folders for docker volumes!"
-mkdir -p data/nginx
+mkdir -p data/nginx/conf.d
+mkdir -p data/nginx/ssl
 mkdir -p data/certbot/conf
 mkdir -p data/certbot/www
 mkdir -p data/ipfs
@@ -15,6 +16,7 @@ path=/etc/letsencrypt/live/$domain
 mkdir -p ./data/certbot/conf/live/$domain
 data_path=./data/certbot
 mkdir -p "$data_path/conf"
+temp_ssl_path=/etc/nginx/ssl
 
 
 docker-compose up -d ipfs_host
@@ -32,7 +34,7 @@ docker-compose exec ipfs_host ipfs config AutoNAT.ServiceMode '"enabled"' --json
 
 
 echo "Adding config files to the volumes!"
-cp nginx.conf ./data/nginx/app.conf
+cp nginx.conf ./data/nginx/conf.d/app.conf
 curl -s https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf > "$data_path/conf/options-ssl-nginx.conf"
 curl -s https://raw.githubusercontent.com/certbot/certbot/master/certbot/certbot/ssl-dhparams.pem > "$data_path/conf/ssl-dhparams.pem"
 
@@ -41,8 +43,8 @@ sleep 5
 
 docker-compose run --rm --entrypoint "\
           openssl req -x509 -nodes -newkey rsa:1024 -days 1\
-          -keyout '$path/privkey.pem' \
-          -out '$path/fullchain.pem' \
+          -keyout '$temp_ssl_path/privkey.pem' \
+          -out '$temp_ssl_path/fullchain.pem' \
           -subj '/CN=localhost'" certbot
 
 echo "Now starting up ipfs and nginx. Printing logs of nginx, if there's any errors stop this script and debug!"
@@ -57,10 +59,15 @@ echo "For the final cert you'll need to answer some questions. Please do so!"
 docker-compose run --rm --entrypoint "\
           certbot certonly --webroot -w /var/www/certbot \
           --email $email \
-          -d $domain
+          -d $domain \
           --rsa-key-size 4096 \
           --agree-tos \
           --force-renewal" certbot
+
+docker-compose run --rm --entrypoint "\
+          ln -s -f $path/fullchain.pem $temp_ssl_path/fullchain.pem; \
+          ln -s -f $path/privkey.pem $temp_ssl_path/privkey.pem" certbot
+
 
 docker-compose down
 echo "Everything should be ready now! Starting..."
