@@ -195,7 +195,7 @@ Project Link: [https://github.com/Mithrandir2k18/dockerized-https-ipfs-gateway](
 * This project was inspired
 [here](https://www.reddit.com/r/ipfs/comments/l509at/how_to_set_up_a_dockerized_ipfs_gateway_with_https/gktbmj4?utm_source=share&utm_medium=web2x&context=3).
 * This project is an implementation of
-[this guide](`https://willschenk.com/articles/2019/setting_up_an_ipfs_node/`).
+[this guide](https://willschenk.com/articles/2019/setting_up_an_ipfs_node/).
 * Thanks to [alexzorin](https://github.com/alexzorin), who has been a quick
 and [huge help](https://github.com/certbot/certbot/issues/8619)!
 * README Template from [here](https://github.com/othneildrew/Best-README-Template).
