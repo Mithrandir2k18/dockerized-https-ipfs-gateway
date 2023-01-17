@@ -28,8 +28,8 @@ echo $(curl http://127.0.0.1:8080/ipfs/QmPChd2hVbrJ6bfo3WBcTW4iZnpHm8TEzWkLHmLpX
 
 echo "Now setting up ipfs-configs!"
 docker-compose exec ipfs_host ipfs config Addresses.Swarm '["/ip4/0.0.0.0/tcp/4001", "/ip4/0.0.0.0/tcp/8081/ws", "/ip6/::/tcp/4001"]' --json
-docker-compose exec ipfs_host ipfs config --bool Swarm.EnableRelayHop true 
-docker-compose exec ipfs_host ipfs config --bool Swarm.EnableAutoRelay true
+docker-compose exec ipfs_host ipfs config --bool Swarm.RelayService.Enabled true 
+docker-compose exec ipfs_host ipfs config --bool Swarm.RelayClient.Enabled true
 docker-compose exec ipfs_host ipfs config AutoNAT.ServiceMode '"enabled"' --json
 
 
